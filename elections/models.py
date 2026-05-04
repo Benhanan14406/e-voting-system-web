@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-STATUS_ENUM = ["Pending", "Ongoing", "Closed"]
+STATUS_ENUM = ["Pending", "Open", "Closed"]
 
 class Election(models.Model):
     title = models.CharField(max_length=200)
