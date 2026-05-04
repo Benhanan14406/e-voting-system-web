@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import CustomUser, LoginAttempt
 from .forms import LoginForm, RegisterForm
-
+from audit.utils import log_action
 
 MAX_ATTEMPTS = 5
 LOCKOUT_MINUTES = 15
@@ -35,6 +35,7 @@ def login_view(request):
 
         if recent_failures >= MAX_ATTEMPTS:
             messages.error(request, f"Too many failed attempts. Try again in {LOCKOUT_MINUTES} minutes.")
+            log_action(request.user, "login_failed", f"User {username} locked out due to too many failed attempts.")
             return render(request, "accounts/login.html", {"form": form})
 
         user = authenticate(request, username=username, password=password)
@@ -42,9 +43,11 @@ def login_view(request):
         if user and user.is_active:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=True)
             login(request, user)
+            log_action(request, "login_successful", f"User {username} logged in successfully.")
             return redirect("dashboard")
         else:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=False)
+            log_action(request, "login_failed", f"User {username} failed to log in.")
             messages.error(request, "Invalid username or password.")
 
     return render(request, "accounts/login.html", {"form": form})
@@ -56,12 +59,14 @@ def register_view(request):
         user.role = "Voter"
         user.save()
         messages.success(request, "Registration successful! Please log in.")
+        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
         return redirect("login")
     return render(request, "accounts/register.html", {"form": form})
 
 
 def logout_view(request):
     logout(request)
+    log_action(request.user, "logout", f"User {request.user.username} logged out.") 
     return redirect("login")
 
 
