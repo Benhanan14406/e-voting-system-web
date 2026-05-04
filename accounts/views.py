@@ -1,3 +1,5 @@
+from urllib import request
+from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -18,9 +20,44 @@ def user_detail(user_id):
     user = CustomUser.objects.get(id=user_id)
     return user 
 
-def login_view(request):
-    form = LoginForm(request.POST or None)
+def register_view(request):
+    form = RegisterForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
+        user = form.save(commit=False)
+        user.role = "Voter"
+        user.save()
+        messages.success(request, "Registration successful! Please log in.")
+        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
+        return redirect("login")
+    return render(request, "accounts/register.html", {"form": form})
+
+class Register(View):
+    def get(self, request, *args, **kwargs):
+        form = RegisterForm()
+        return render(request, "accounts/register.html", {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        form = RegisterForm(request.POST or None)
+        if not form.is_valid():
+            return render(request, "accounts/register.html", {"form": form})
+
+        user = form.save(commit=False)
+        user.role = "Voter"
+        user.save()
+        messages.success(request, "Registration successful! Please log in.")
+        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
+        return redirect("login")
+
+class Login(View):
+    def get(self, request, *args, **kwargs):
+        form = LoginForm()
+        return render(request, "accounts/login.html", {"form": form})
+    
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(request.POST or None)
+        if not form.is_valid():
+            return render(request, "accounts/login.html", {"form": form})
+
         username = form.cleaned_data["username"]
         password = form.cleaned_data["password"]
         ip = get_client_ip(request)
@@ -35,7 +72,7 @@ def login_view(request):
 
         if recent_failures >= MAX_ATTEMPTS:
             messages.error(request, f"Too many failed attempts. Try again in {LOCKOUT_MINUTES} minutes.")
-            log_action(request.user, "login_failed", f"User {username} locked out due to too many failed attempts.")
+            log_action(request, "login_failed", f"User {username} locked out due to too many failed attempts.")
             return render(request, "accounts/login.html", {"form": form})
 
         user = authenticate(request, username=username, password=password)
@@ -50,25 +87,11 @@ def login_view(request):
             log_action(request, "login_failed", f"User {username} failed to log in.")
             messages.error(request, "Invalid username or password.")
 
-    return render(request, "accounts/login.html", {"form": form})
-
-def register_view(request):
-    form = RegisterForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        user = form.save(commit=False)
-        user.role = "Voter"
-        user.save()
-        messages.success(request, "Registration successful! Please log in.")
-        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
+class Logout(View):
+    def get(self, request, *args, **kwargs):
+        log_action(request.user, "logout", f"User {request.user.username} logged out.")
+        logout(request)
         return redirect("login")
-    return render(request, "accounts/register.html", {"form": form})
-
-
-def logout_view(request):
-    logout(request)
-    log_action(request.user, "logout", f"User {request.user.username} logged out.") 
-    return redirect("login")
-
 
 def get_client_ip(request):
     x_forwarded = request.META.get("HTTP_X_FORWARDED_FOR")
