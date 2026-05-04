@@ -1,3 +1,20 @@
 from django.db import models
+from django.conf import settings
 
-# Create your models here.
+STATUS_ENUM = ["Pending", "Ongoing", "Closed"]
+
+class Election(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=[status for status in STATUS_ENUM], default="Pending")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+
+class Candidate(models.Model):
+    election = models.ForeignKey(Election, on_delete=models.CASCADE, related_name="candidates")
+    name = models.CharField(max_length=100)
+    vision = models.TextField(blank=True)
+    mission = models.TextField(blank=True)
