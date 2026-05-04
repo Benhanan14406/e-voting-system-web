@@ -8,7 +8,7 @@ class Election(models.Model):
     description = models.TextField(blank=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    status = models.CharField(max_length=10, choices=[status for status in STATUS_ENUM], default="Pending")
+    status = models.CharField(max_length=10, choices=[(status, status) for status in STATUS_ENUM], default="Pending")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     created_at  = models.DateTimeField(auto_now_add=True)
 
