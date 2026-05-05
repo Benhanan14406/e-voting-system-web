@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+
+<h2>Register</h2>
+
+<!--
+  SECURITY: CSRF token (CWE-352)
+  SECURITY: Input validation enforced server-side in RegisterForm (CWE-20)
+  SECURITY: Password complexity enforced via Django validators (CWE-521)
+  SECURITY: Password hashed with bcrypt on save — never stored plaintext (CWE-916)
+-->
+
+<form method="POST" action="{% url 'register' %}">
+  {% csrf_token %}
+
+  <p>
+    <label for="id_username">Username</label><br>
+    <small>3–30 characters. Letters, numbers, and underscores only.</small><br>
+    <input
+      type="text"
+      id="id_username"
+      name="username"
+      maxlength="30"
+      required
+      autocomplete="username"
+    >
+    {% if form.username.errors %}
+      <br><small>{{ form.username.errors }}</small>
+    {% endif %}
+  </p>
+
+  <p>
+    <label for="id_email">Email</label><br>
+    <input
+      type="email"
+      id="id_email"
+      name="email"
+      required
+      autocomplete="email"
+    >
+    {% if form.email.errors %}
+      <br><small>{{ form.email.errors }}</small>
+    {% endif %}
+  </p>
+
+  <p>
+    <label for="id_password1">Password</label><br>
+    <small>Minimum 8 characters. Must contain uppercase, lowercase, and a number.</small><br>
+    <input
+      type="password"
+      id="id_password1"
+      name="password1"
+      required
+      autocomplete="new-password"
+    >
+    {% if form.password1.errors %}
+      <br><small>{{ form.password1.errors }}</small>
+    {% endif %}
+  </p>
+
+  <p>
+    <label for="id_password2">Confirm Password</label><br>
+    <input
+      type="password"
+      id="id_password2"
+      name="password2"
+      required
+      autocomplete="new-password"
+    >
+    {% if form.password2.errors %}
+      <br><small>{{ form.password2.errors }}</small>
+    {% endif %}
+  </p>
+
+  <button type="submit">Register</button>
+</form>
+
+<p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+
+{% endblock %}

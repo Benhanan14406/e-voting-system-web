@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Manage Elections{% endblock %}
+{% block content %}
+
+<h2>Elections</h2>
+<a href="{% url 'election_create' %}">+ New Election</a>
+
+<br><br>
+
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Status</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Created By</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in elections %}
+    <tr>
+      <td>{{ e.title }}</td>
+      <td>{{ e.status }}</td>
+      <td>{{ e.start_date }}</td>
+      <td>{{ e.end_date }}</td>
+      <td>{{ e.created_by }}</td>
+      <td>
+        <a href="{% url 'candidate_list' e.pk %}">Candidates</a>
+        &nbsp;|&nbsp;
+        <a href="{% url 'results' e.pk %}">Results</a>
+
+        {% if e.status == "pending" %}
+        &nbsp;|&nbsp;
+        <!-- SECURITY: POST + CSRF for all state-changing actions (CWE-352) -->
+        <form method="POST" action="{% url 'election_open' e.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Open</button>
+        </form>
+        {% endif %}
+
+        {% if e.status == "open" %}
+        &nbsp;|&nbsp;
+        <form method="POST" action="{% url 'election_close' e.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit">Close</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No elections yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

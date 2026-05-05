@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Vote — {{ election.title }}{% endblock %}
+{% block content %}
+
+<h2>{{ election.title }}</h2>
+
+<!--
+  SECURITY: CSRF token on vote submission (CWE-352)
+  SECURITY: Double-vote guard enforced server-side — not just hidden in UI (CWE-285)
+  SECURITY: Candidate ownership verified in view — prevents IDOR (CWE-639)
+  SECURITY: Election status checked server-side before accepting vote
+-->
+
+<p>Select your candidate carefully. Your vote is final and cannot be changed.</p>
+
+<form method="POST" action="{% url 'vote' election.pk %}">
+  {% csrf_token %}
+
+  {% for candidate in form.candidate %}
+  <p>
+    {{ candidate.tag }}
+    <label for="{{ candidate.id_for_label }}">
+      <strong>{{ candidate.choice_label }}</strong>
+    </label>
+  </p>
+  {% endfor %}
+
+  {% if form.candidate.errors %}
+  <p><small>{{ form.candidate.errors }}</small></p>
+  {% endif %}
+
+  <button type="submit" onclick="return confirm('Are you sure? This action cannot be undone.')">
+    Submit Vote
+  </button>
+</form>
+
+<br>
+<a href="{% url 'dashboard' %}">Cancel — Back to Dashboard</a>
+
+{% endblock %}
