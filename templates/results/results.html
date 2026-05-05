@@ -16,7 +16,6 @@
     <tr>
       <th>Rank</th>
       <th>Candidate</th>
-      <th>Vision</th>
       <th>Votes</th>
       <th>Percentage</th>
     </tr>
@@ -26,7 +25,6 @@
     <tr>
       <td>{{ forloop.counter }}</td>
       <td><strong>{{ candidate.name }}</strong></td>
-      <td>{{ candidate.vision }}</td>
       <td>{{ candidate.vote_count }}</td>
       <td>
         {% if total_votes > 0 %}
