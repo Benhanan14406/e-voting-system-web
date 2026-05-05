@@ -64,7 +64,8 @@ class CastVoteView(VoterRequiredMixin, View):
 class VoteConfirmationView(VoterRequiredMixin, View):
     def get(self, request, pk):
         election = get_object_or_404(Election, pk=pk)
-        if not Vote.objects.filter(election=election, voter=request.user).exists():
+        token = generate_voter_token(request.user.id, pk)
+        if not Vote.objects.filter(election=election, voter_token=token).exists():
             messages.warning(request, "You have not voted in this election.")
             return redirect("dashboard")
         return render(request, "voting/confirmation.html", {"election": election})
