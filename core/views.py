@@ -5,7 +5,7 @@ from voting.models import Vote
 
 @login_required
 def dashboard(request):
-    if request.user.role == "admin":
+    if request.user.role == "Admin":
         elections = Election.objects.all().order_by("-created_at")
         return render(request, "core/dashboard_admin.html", {"elections": elections})
     else:
