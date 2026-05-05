@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Vote Confirmed{% endblock %}
+{% block content %}
+
+<h2>Vote Confirmed</h2>
+
+<p>Your vote for <strong>{{ election.title }}</strong> has been recorded and locked.</p>
+<p>It cannot be changed or deleted.</p>
+
+<!--
+  SECURITY: No candidate choice is displayed here — preserves voter anonymity (CWE-200)
+-->
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+
+{% endblock %}

@@ -22,4 +22,7 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('audit.urls')),
     path('', include('core.urls')),
+    path('', include('elections.urls')),
+    path('', include('voting.urls')),
+    path('', include('results.urls'))
 ]

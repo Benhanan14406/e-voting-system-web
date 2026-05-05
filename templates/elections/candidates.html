@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Candidates — {{ election.title }}{% endblock %}
+{% block content %}
+
+<h2>Candidates — {{ election.title }}</h2>
+<p>Status: {{ election.status }}</p>
+<a href="{% url 'election_list' %}">← Back to Elections</a>
+
+<hr>
+
+{% if election.status == "pending" %}
+<h3>Add Candidate</h3>
+
+<!--
+  SECURITY: CSRF token (CWE-352)
+  SECURITY: Input validated and sanitized in CandidateForm (CWE-20)
+  SECURITY: Candidates can only be added when election is pending — enforced in view
+-->
+
+<form method="POST" action="{% url 'candidate_add' election.pk %}">
+  {% csrf_token %}
+
+  <p>
+    <label for="id_name">Name</label><br>
+    {{ form.name }}
+    {% if form.name.errors %}<br><small>{{ form.name.errors }}</small>{% endif %}
+  </p>
+
+  <p>
+    <label for="id_vision">Vision</label><br>
+    {{ form.vision }}
+    {% if form.vision.errors %}<br><small>{{ form.vision.errors }}</small>{% endif %}
+  </p>
+
+  <p>
+    <label for="id_mission">Mission</label><br>
+    {{ form.mission }}
+    {% if form.mission.errors %}<br><small>{{ form.mission.errors }}</small>{% endif %}
+  </p>
+
+  <button type="submit">Add Candidate</button>
+</form>
+
+<hr>
+{% else %}
+<p><em>Candidates cannot be modified once the election is open or closed.</em></p>
+{% endif %}
+
+<h3>Current Candidates ({{ candidates|length }})</h3>
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Vision</th>
+      <th>Mission</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in candidates %}
+    <tr>
+      <td>{{ c.name }}</td>
+      <td>{{ c.vision }}</td>
+      <td>{{ c.mission }}</td>
+      <td>
+        {% if election.status == "pending" %}
+        <!-- SECURITY: DELETE action uses POST + CSRF, never GET (CWE-352) -->
+        <form method="POST" action="{% url 'candidate_delete' c.pk %}">
+          {% csrf_token %}
+          <button type="submit">Remove</button>
+        </form>
+        {% else %}
+        <em>—</em>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No candidates yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
