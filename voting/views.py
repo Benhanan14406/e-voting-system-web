@@ -15,7 +15,7 @@ class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 class CastVoteView(VoterRequiredMixin, View):
     def get(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="open")
+        election = get_object_or_404(Election, pk=pk, status="Open")
         token = generate_voter_token(request.user.id, pk)
 
         if Vote.objects.filter(election=election, voter_token=token).exists():
@@ -29,7 +29,7 @@ class CastVoteView(VoterRequiredMixin, View):
         })
 
     def post(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="open")
+        election = get_object_or_404(Election, pk=pk, status="Open")
         token = generate_voter_token(request.user.id, pk)
 
         if Vote.objects.filter(election=election, voter_token=token).exists():
