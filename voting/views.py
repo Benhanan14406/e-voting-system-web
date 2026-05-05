@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import View
 from django.contrib import messages
-from elections.models import Election, Candidate
-from .models import Vote
+from elections.models import Election
+from .models import Vote, generate_voter_token
 from .forms import VoteForm
 from audit.utils import log_action
 
@@ -15,9 +15,10 @@ class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 class CastVoteView(VoterRequiredMixin, View):
     def get(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="Open")
+        election = get_object_or_404(Election, pk=pk, status="open")
+        token = generate_voter_token(request.user.id, pk)
 
-        if Vote.objects.filter(election=election, voter=request.user).exists():
+        if Vote.objects.filter(election=election, voter_token=token).exists():
             messages.warning(request, "You have already voted in this election.")
             return redirect("dashboard")
 
@@ -28,9 +29,10 @@ class CastVoteView(VoterRequiredMixin, View):
         })
 
     def post(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="Open")
+        election = get_object_or_404(Election, pk=pk, status="open")
+        token = generate_voter_token(request.user.id, pk)
 
-        if Vote.objects.filter(election=election, voter=request.user).exists():
+        if Vote.objects.filter(election=election, voter_token=token).exists():
             log_action(request, "DOUBLE_VOTE_ATTEMPT", f"User {request.user} tried to vote twice in election {pk}")
             messages.warning(request, "You have already voted in this election.")
             return redirect("dashboard")
@@ -51,10 +53,10 @@ class CastVoteView(VoterRequiredMixin, View):
 
         Vote.objects.create(
             election=election,
-            voter=request.user,
+            voter_token=token,
             candidate=candidate,
         )
-        log_action(request, "VOTE_CAST", f"Vote cast in election {pk} for candidate {candidate.name}")
+        log_action(request, "VOTE_CAST", f"Vote cast in election {pk} for candidate {candidate.name} from user {request.user.id}")
         messages.success(request, "Your vote has been recorded!")
         return redirect("vote_confirmation", pk=pk)
 
