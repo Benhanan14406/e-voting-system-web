@@ -26,7 +26,7 @@ def register_view(request):
         user.role = "Voter"
         user.save()
         messages.success(request, "Registration successful! Please log in.")
-        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
+        log_action(request, "REGISTRATION_SUCCESSFUL", f"User {user.username} registered successfully.")
         return redirect("login")
     return render(request, "accounts/register.html", {"form": form})
 
@@ -44,7 +44,7 @@ class Register(View):
         user.role = "Voter"
         user.save()
         messages.success(request, "Registration successful! Please log in.")
-        log_action(request, "registration_successful", f"User {user.username} registered successfully.")
+        log_action(request, "REGISTRATION_SUCCESSFUL", f"User {user.username} registered successfully.")
         return redirect("login")
 
 class Login(View):
@@ -71,7 +71,7 @@ class Login(View):
 
         if recent_failures >= MAX_ATTEMPTS:
             messages.error(request, f"Too many failed attempts. Try again in {LOCKOUT_MINUTES} minutes.")
-            log_action(request, "login_failed", f"User {username} locked out due to too many failed attempts.")
+            log_action(request, "LOGIN_FAILED", f"User {username} locked out due to too many failed attempts.")
             return render(request, "accounts/login.html", {"form": form})
 
         user = authenticate(request, username=username, password=password)
@@ -79,17 +79,17 @@ class Login(View):
         if user and user.is_active:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=True)
             login(request, user)
-            log_action(request, "login_successful", f"User {username} logged in successfully.")
+            log_action(request, "LOGIN_SUCCESSFUL", f"User {username} logged in successfully.")
             return redirect("dashboard")
         else:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=False)
-            log_action(request, "login_failed", f"User {username} failed to log in.")
+            log_action(request, "LOGIN_FAILED", f"User {username} failed to log in.")
             messages.error(request, "Invalid username or password.")
             return render(request, "accounts/login.html", {"form": form})
 
 class Logout(View):
     def post(self, request, *args, **kwargs):
-        log_action(request, "logout", f"User {request.user.username} logged out.")
+        log_action(request, "LOGOUT", f"User {request.user.username} logged out.")
         logout(request)
         return redirect("login")
 
