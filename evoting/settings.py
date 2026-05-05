@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'audit',
     'elections',
     'voting',
+    'results',
 ]
 
 MIDDLEWARE = [
