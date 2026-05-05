@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Voter Dashboard{% endblock %}
+{% block content %}
+
+<h2>Voter Dashboard</h2>
+<p>Welcome, {{ request.user.username }}.</p>
+
+<h3>Open Elections</h3>
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Closes</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in elections %}
+    <tr>
+      <td>{{ e.title }}</td>
+      <td>{{ e.end_date }}</td>
+      <td>
+        {% if e.pk in voted_ids %}
+          Voted
+        {% else %}
+          Not yet voted
+        {% endif %}
+      </td>
+      <td>
+        {% if e.pk in voted_ids %}
+          <em>Already voted</em>
+        {% else %}
+          <a href="{% url 'vote' e.pk %}">Cast Vote</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">No open elections at the moment.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

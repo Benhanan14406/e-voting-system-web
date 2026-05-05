@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block content %}
+
+<h2>Audit Log</h2>
+
+<p>Showing last 200 entries. Each row is integrity-hashed with SHA-256.</p>
+
+<table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Time</th>
+      <th>User</th>
+      <th>Action</th>
+      <th>Details</th>
+      <th>IP Address</th>
+      <th>Integrity Hash (first 16 chars)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.id }}</td>
+      <td>{{ log.logged_at }}</td>
+      <td>{{ log.user|default:"—" }}</td>
+      <td>{{ log.action }}</td>
+      <td>{{ log.details }}</td>
+      <td>{{ log.ip_address }}</td>
+      <td><code>{{ log.integrity_hash|truncatechars:16 }}</code></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No log entries yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br>
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+
+{% endblock %}

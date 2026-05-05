@@ -10,7 +10,7 @@ from audit.utils import log_action
 
 class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == "voter"
+        return self.request.user.role == "Voter"
 
 
 class CastVoteView(VoterRequiredMixin, View):

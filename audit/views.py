@@ -9,4 +9,4 @@ class AuditLogView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request):
         logs = AuditLog.objects.select_related('user').all()[:200]
-        return render(request, "udit/log.html", {"logs": logs})
+        return render(request, "audit/log.html", {"logs": logs})

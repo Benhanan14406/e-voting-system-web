@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <title>{% block title %}E-Voting System{% endblock %}</title>
+</head>
+<body>
+
+<nav>
+  <strong>E-Voting System</strong>
+  &nbsp;|&nbsp;
+  {% if request.user.is_authenticated %}
+    Logged in as <strong>{{ request.user.username }}</strong>
+    ({{ request.user.role }})
+    &nbsp;|&nbsp;
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    {% if request.user.role == "Admin" %}
+      &nbsp;|&nbsp;
+      <a href="{% url 'election_list' %}">Elections</a>
+      &nbsp;|&nbsp;
+      <a href="{% url 'audit_log' %}">Audit Log</a>
+    {% endif %}
+    &nbsp;|&nbsp;
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    &nbsp;|&nbsp;
+    <a href="{% url 'register' %}">Register</a>
+  {% endif %}
+</nav>
+
+<hr>
+
+<div>
+  {% if messages %}
+    {% for message in messages %}
+      <p><strong>[{{ message.tags|upper }}]</strong> {{ message }}</p>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
