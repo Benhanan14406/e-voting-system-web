@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from datetime import timedelta
 from .models import CustomUser, LoginAttempt
 from .forms import LoginForm, RegisterForm
