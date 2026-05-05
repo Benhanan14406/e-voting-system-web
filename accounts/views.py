@@ -1,4 +1,3 @@
-from urllib import request
 from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
@@ -37,7 +36,7 @@ class Register(View):
         return render(request, "accounts/register.html", {"form": form})
 
     def post(self, request, *args, **kwargs):
-        form = RegisterForm(request.POST or None)
+        form = RegisterForm(request.POST)
         if not form.is_valid():
             return render(request, "accounts/register.html", {"form": form})
 
@@ -54,7 +53,7 @@ class Login(View):
         return render(request, "accounts/login.html", {"form": form})
     
     def post(self, request, *args, **kwargs):
-        form = LoginForm(request.POST or None)
+        form = LoginForm(request.POST)
         if not form.is_valid():
             return render(request, "accounts/login.html", {"form": form})
 
@@ -86,10 +85,11 @@ class Login(View):
             LoginAttempt.objects.create(username=username, ip_address=ip, success=False)
             log_action(request, "login_failed", f"User {username} failed to log in.")
             messages.error(request, "Invalid username or password.")
+            return render(request, "accounts/login.html", {"form": form})
 
 class Logout(View):
-    def get(self, request, *args, **kwargs):
-        log_action(request.user, "logout", f"User {request.user.username} logged out.")
+    def post(self, request, *args, **kwargs):
+        log_action(request, "logout", f"User {request.user.username} logged out.")
         logout(request)
         return redirect("login")
 

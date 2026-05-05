@@ -8,14 +8,8 @@
 
 <hr>
 
-{% if election.status == "pending" %}
+{% if election.status == "Pending" %}
 <h3>Add Candidate</h3>
-
-<!--
-  SECURITY: CSRF token (CWE-352)
-  SECURITY: Input validated and sanitized in CandidateForm (CWE-20)
-  SECURITY: Candidates can only be added when election is pending — enforced in view
--->
 
 <form method="POST" action="{% url 'candidate_add' election.pk %}">
   {% csrf_token %}
@@ -63,8 +57,7 @@
       <td>{{ c.vision }}</td>
       <td>{{ c.mission }}</td>
       <td>
-        {% if election.status == "pending" %}
-        <!-- SECURITY: DELETE action uses POST + CSRF, never GET (CWE-352) -->
+        {% if election.status == "Pending" %}
         <form method="POST" action="{% url 'candidate_delete' c.pk %}">
           {% csrf_token %}
           <button type="submit">Remove</button>

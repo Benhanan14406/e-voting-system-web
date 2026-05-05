@@ -4,15 +4,10 @@
 
 <h2>Results — {{ election.title }}</h2>
 
-<!--
-  SECURITY: Voters can only reach this page after election is closed.
-  Access control is enforced in ResultsView, not just in this template (CWE-285).
--->
-
 <p>Status: {{ election.status }}</p>
 <p>Total votes cast: {{ total_votes }}</p>
 
-{% if election.status != "closed" %}
+{% if election.status != "Closed" %}
 <p><em>Warning: This is a live preview. Election is still open. Only admins can see this.</em></p>
 {% endif %}
 

@@ -4,13 +4,6 @@
 
 <h2>Register</h2>
 
-<!--
-  SECURITY: CSRF token (CWE-352)
-  SECURITY: Input validation enforced server-side in RegisterForm (CWE-20)
-  SECURITY: Password complexity enforced via Django validators (CWE-521)
-  SECURITY: Password hashed with bcrypt on save — never stored plaintext (CWE-916)
--->
-
 <form method="POST" action="{% url 'register' %}">
   {% csrf_token %}
 

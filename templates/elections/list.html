@@ -31,7 +31,7 @@
         &nbsp;|&nbsp;
         <a href="{% url 'results' e.pk %}">Results</a>
 
-        {% if e.status == "pending" %}
+        {% if e.status == "Pending" %}
         &nbsp;|&nbsp;
         <!-- SECURITY: POST + CSRF for all state-changing actions (CWE-352) -->
         <form method="POST" action="{% url 'election_open' e.pk %}" style="display:inline;">
@@ -40,7 +40,7 @@
         </form>
         {% endif %}
 
-        {% if e.status == "open" %}
+        {% if e.status == "Open" %}
         &nbsp;|&nbsp;
         <form method="POST" action="{% url 'election_close' e.pk %}" style="display:inline;">
           {% csrf_token %}

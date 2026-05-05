@@ -10,12 +10,12 @@ from audit.utils import log_action
 
 class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == "voter"
+        return self.request.user.role == "Voter"
 
 
 class CastVoteView(VoterRequiredMixin, View):
     def get(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="open")
+        election = get_object_or_404(Election, pk=pk, status="Open")
 
         if Vote.objects.filter(election=election, voter=request.user).exists():
             messages.warning(request, "You have already voted in this election.")
@@ -28,7 +28,7 @@ class CastVoteView(VoterRequiredMixin, View):
         })
 
     def post(self, request, pk):
-        election = get_object_or_404(Election, pk=pk, status="open")
+        election = get_object_or_404(Election, pk=pk, status="Open")
 
         if Vote.objects.filter(election=election, voter=request.user).exists():
             log_action(request, "DOUBLE_VOTE_ATTEMPT", f"User {request.user} tried to vote twice in election {pk}")
