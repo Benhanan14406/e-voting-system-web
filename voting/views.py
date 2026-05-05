@@ -60,7 +60,6 @@ class CastVoteView(VoterRequiredMixin, View):
         messages.success(request, "Your vote has been recorded!")
         return redirect("vote_confirmation", pk=pk)
 
-
 class VoteConfirmationView(VoterRequiredMixin, View):
     def get(self, request, pk):
         election = get_object_or_404(Election, pk=pk)
