@@ -3,3 +3,4 @@ python-dotenv
 bcrypt
 django[bcrypt]
 django-ratelimit
+bleach

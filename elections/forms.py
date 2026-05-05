@@ -1,5 +1,11 @@
 from django import forms
 from .models import Election, Candidate
+import bleach
+
+ALLOWED_TAGS = []
+
+def sanitize(value):
+    return bleach.clean(value, tags=ALLOWED_TAGS, strip=True)
 
 class ElectionForm(forms.ModelForm):
     class Meta:
@@ -9,6 +15,12 @@ class ElectionForm(forms.ModelForm):
             "start_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "end_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
+
+    def clean_title(self):
+        return sanitize(self.cleaned_data["title"])
+
+    def clean_description(self):
+        return sanitize(self.cleaned_data["description"])
 
     def clean(self):
         cleaned_data = super().clean()
@@ -23,3 +35,12 @@ class CandidateForm(forms.ModelForm):
     class Meta:
         model = Candidate
         fields = ["name", "vision", "mission"]
+
+    def clean_name(self):
+        return sanitize(self.cleaned_data["name"])
+
+    def clean_vision(self):
+        return sanitize(self.cleaned_data["vision"])
+
+    def clean_mission(self):
+        return sanitize(self.cleaned_data["mission"])
