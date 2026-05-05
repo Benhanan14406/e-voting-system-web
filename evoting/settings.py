@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'audit',
+    'core',
     'elections',
     'voting',
     'results',
