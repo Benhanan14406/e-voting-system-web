@@ -79,6 +79,7 @@ class Login(View):
 
         if user and user.is_active:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=True)
+            request.session.cycle_key()
             login(request, user)
             log_action(request, "LOGIN_SUCCESSFUL", f"User {username} logged in successfully.")
             return redirect("dashboard")
