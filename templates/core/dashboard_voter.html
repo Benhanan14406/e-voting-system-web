@@ -21,10 +21,6 @@
       <td>{{ e.title }}</td>
       <td>{{ e.end_date }}</td>
       <td>
-        <!--
-          SECURITY: Voter cannot see results until election is closed (CWE-200)
-          This is enforced in the view, not just hidden in the template
-        -->
         {% if e.pk in voted_ids %}
           Voted
         {% else %}

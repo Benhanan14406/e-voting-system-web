@@ -4,12 +4,6 @@
 
 <h2>{{ action }} Election</h2>
 
-<!--
-  SECURITY: CSRF token on POST form (CWE-352)
-  SECURITY: Date validation enforced server-side in ElectionForm.clean() (CWE-20)
-  SECURITY: Input sanitized via Django forms — no raw string concatenation into DB (CWE-89)
--->
-
 <form method="POST">
   {% csrf_token %}
 

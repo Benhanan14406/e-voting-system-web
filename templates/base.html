@@ -17,7 +17,7 @@
     ({{ request.user.role }})
     &nbsp;|&nbsp;
     <a href="{% url 'dashboard' %}">Dashboard</a>
-    {% if request.user.role == "admin" %}
+    {% if request.user.role == "Admin" %}
       &nbsp;|&nbsp;
       <a href="{% url 'election_list' %}">Elections</a>
       &nbsp;|&nbsp;
