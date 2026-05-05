@@ -56,7 +56,7 @@ class CastVoteView(VoterRequiredMixin, View):
             voter_token=token,
             candidate=candidate,
         )
-        log_action(request, "VOTE_CAST", f"Vote cast in election {pk} for candidate {candidate.name} from user {request.user.id}")
+        log_action(request, "VOTE_CAST", f"Vote cast in election {pk} for candidate {candidate.name} from user {request.user.username}")
         messages.success(request, "Your vote has been recorded!")
         return redirect("vote_confirmation", pk=pk)
 
