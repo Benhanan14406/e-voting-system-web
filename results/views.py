@@ -12,7 +12,7 @@ class ResultsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         election = get_object_or_404(Election, pk=pk)
 
-        if election.status != "closed" and request.user.role != "admin":
+        if election.status != "Closed" and request.user.role != "Admin":
             messages.warning(request, "Results are only available after the election closes.")
             return redirect("dashboard")
 

@@ -9,7 +9,7 @@ def dashboard(request):
         elections = Election.objects.all().order_by("-created_at")
         return render(request, "core/dashboard_admin.html", {"elections": elections})
     else:
-        elections = Election.objects.filter(status="open")
+        elections = Election.objects.filter(status="Open")
         voted_ids = Vote.objects.filter(
             voter=request.user
         ).values_list("election_id", flat=True)
