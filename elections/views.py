@@ -5,6 +5,8 @@ from django.contrib import messages
 from .models import Election, Candidate
 from .forms import ElectionForm, CandidateForm
 from audit.utils import log_action
+from voting.models import Vote
+from results.models import Result
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
@@ -60,7 +62,12 @@ class ElectionCloseView(AdminRequiredMixin, View):
         
         election.status = "Closed"
         election.save()
-        log_action(request, "ELECTION_CLOSE", f"Election \"{election.title}\" closed")
+
+        total_votes = Vote.objects.filter(election=election).count()
+        result = Result.objects.create(election=election, total_votes=total_votes)
+        result.save()
+
+        log_action(request, "ELECTION_CLOSE", f"Election \"{election.title}\" closed. Result {result.id} created with total votes = {total_votes}.")
         messages.success(request, f"\"{election.title}\" has been closed.")
 
         return redirect("election_list")
@@ -72,11 +79,7 @@ class CandidateListView(AdminRequiredMixin, View):
         candidates = election.candidates.all()
         form = CandidateForm()
 
-        return render(request, "elections/candidates.html", {
-            "election": election,
-            "candidates": candidates,
-            "form": form,
-        })
+        return render(request, "elections/candidates.html", {"election": election, "candidates": candidates, "form": form,})
 
 
 class CandidateCreateView(AdminRequiredMixin, View):
