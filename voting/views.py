@@ -7,7 +7,6 @@ from .models import Vote, generate_voter_token
 from .forms import VoteForm
 from audit.utils import log_action
 
-
 class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.role == "Voter"
