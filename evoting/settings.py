@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'elections',
     'voting',
     'results',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,9 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600  # 1 hour expiry
+
+# CAPTCHA Settings
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null',)
+CAPTCHA_LENGTH = 1
+CAPTCHA_TIMEOUT = 5 

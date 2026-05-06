@@ -4,3 +4,5 @@ bcrypt
 django[bcrypt]
 django-ratelimit
 bleach
+django-simple-captcha
+Pillow

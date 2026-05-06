@@ -38,6 +38,14 @@
     {% endif %}
   </p>
 
+  <p>
+    <label>Verification</label><br>
+    {{ form.captcha }}
+    {% if form.captcha.errors %}
+      <br><small>{{ form.captcha.errors }}</small>
+    {% endif %}
+  </p>
+
   <button type="submit">Login</button>
 </form>
 
