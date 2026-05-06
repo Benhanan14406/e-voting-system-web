@@ -12,7 +12,6 @@ class VoterRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         return self.request.user.role == "Voter"
 
-
 class CastVoteView(VoterRequiredMixin, View):
     def get(self, request, pk):
         election = get_object_or_404(Election, pk=pk, status="Open")
