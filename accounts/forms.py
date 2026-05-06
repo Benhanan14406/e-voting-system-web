@@ -37,3 +37,41 @@ class RegisterForm(UserCreationForm):
         if password1 != password2:
             raise forms.ValidationError("Passwords do not match.")
         return password1
+    
+class MFAVerifyForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            "placeholder": "6-digit code",
+            "autocomplete": "one-time-code",
+            "inputmode": "numeric",
+            "pattern": "[0-9]{6}",
+        }),
+        label="Authenticator code",
+    )
+ 
+    def clean_code(self):
+        code = self.cleaned_data["code"].strip()
+        if not code.isdigit():
+            raise forms.ValidationError("Code must be 6 digits.")
+        return code
+
+class MFASetupConfirmForm(forms.Form):
+    code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            "placeholder": "6-digit code from your app",
+            "autocomplete": "one-time-code",
+            "inputmode": "numeric",
+            "pattern": "[0-9]{6}",
+        }),
+        label="Confirm code from authenticator app",
+    )
+ 
+    def clean_code(self):
+        code = self.cleaned_data["code"].strip()
+        if not code.isdigit():
+            raise forms.ValidationError("Code must be 6 digits.")
+        return code
