@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Set Up Two-Factor Authentication{% endblock %}
+{% block content %}
+
+<h2>Set Up Two-Factor Authentication</h2>
+
+<p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.):</p>
+
+<img src="data:image/png;base64,{{ qr_code }}" alt="MFA QR Code" style="display:block; margin: 1rem 0;">
+
+<p>Can't scan? Enter this code manually into your app:</p>
+<code style="font-size: 1.1rem; letter-spacing: 0.2em;">{{ secret }}</code>
+
+<hr>
+
+<p>Once you've scanned the code, enter the 6-digit code from your app below to confirm setup:</p>
+
+<form method="POST" action="{% url 'mfa_setup' %}">
+  {% csrf_token %}
+  <p>
+    <label for="id_code">{{ form.code.label }}</label><br>
+    <input
+      type="text"
+      id="id_code"
+      name="code"
+      maxlength="6"
+      minlength="6"
+      required
+      autocomplete="one-time-code"
+      inputmode="numeric"
+      pattern="[0-9]{6}"
+      placeholder="000000"
+    >
+    {% if form.code.errors %}
+      <br><small>{{ form.code.errors }}</small>
+    {% endif %}
+  </p>
+  <button type="submit">Activate Two-Factor Authentication</button>
+</form>
+
+<p><a href="{% url 'dashboard' %}">Cancel</a></p>
+
+{% endblock %}

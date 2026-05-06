@@ -6,3 +6,5 @@ django-ratelimit
 bleach
 django-simple-captcha
 Pillow
+pyotp
+qrcode
