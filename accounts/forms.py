@@ -1,14 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from captcha.fields import CaptchaField
 from .models import CustomUser
 import re
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"placeholder": "Username"}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder": "Password"}))
+    captcha = CaptchaField()
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
+    captcha = CaptchaField()
 
     class Meta:
         model = CustomUser
