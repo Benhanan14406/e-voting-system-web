@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-from .models import LoginAttempt
+from .models import LoginAttempt, MFASecret
 from .forms import LoginForm, RegisterForm
 from audit.utils import log_action
 
@@ -50,16 +50,26 @@ class Login(View):
 
         cutoff = timezone.now() - timedelta(minutes=LOCKOUT_MINUTES)
         recent_failures = LoginAttempt.objects.filter(username=username, success=False, attempted_at__gte=cutoff).count()
-
         if recent_failures >= MAX_ATTEMPTS:
             messages.error(request, f"Too many failed attempts. Try again in {LOCKOUT_MINUTES} minutes.")
             log_action(request, "LOGIN_FAILED", f"User {username} locked out due to too many failed attempts.")
+            
             return render(request, "accounts/login.html", {"form": form})
 
         user = authenticate(request, username=username, password=password)
-
         if user and user.is_active:
             LoginAttempt.objects.create(username=username, ip_address=ip, success=True)
+            
+            try:
+                mfa = user.mfa_secret
+                if mfa.enabled:
+                    request.session.cycle_key()
+                    request.session["mfa_user_id"] = str(user.pk)
+                    log_action(request, "LOGIN_MFA_REQUIRED", f"User {username} passed password, awaiting MFA.")
+                    return redirect("mfa_verify")
+            except MFASecret.DoesNotExist:
+                pass
+            
             request.session.cycle_key()
             login(request, user)
             log_action(request, "LOGIN_SUCCESSFUL", f"User {username} logged in successfully.")
