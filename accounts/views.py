@@ -1,11 +1,13 @@
 from django.views import View
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from datetime import timedelta
-from .models import LoginAttempt, MFASecret
-from .forms import LoginForm, RegisterForm
+from .models import CustomUser, LoginAttempt, MFASecret
+from .forms import LoginForm, RegisterForm, MFASetupConfirmForm, MFAVerifyForm
+from .mfa_utils import generate_totp_secret, verify_totp, generate_qr_code_base64
 from audit.utils import log_action
 
 MAX_ATTEMPTS = 5
@@ -85,3 +87,99 @@ class Logout(View):
         log_action(request, "LOGOUT", f"User {request.user.username} logged out.")
         logout(request)
         return redirect("login")
+    
+class MFAVerifyView(View):
+    def get(self, request):
+        if "mfa_user_id" not in request.session:
+            return redirect("login")
+        return render(request, "accounts/mfa_verify.html", {"form": MFAVerifyForm()})
+ 
+    def post(self, request):
+        if "mfa_user_id" not in request.session:
+            return redirect("login")
+ 
+        form = MFAVerifyForm(request.POST)
+        if not form.is_valid():
+            return render(request, "accounts/mfa_verify.html", {"form": form})
+ 
+        code = form.cleaned_data["code"]
+        user_id = request.session.get("mfa_user_id")
+ 
+        try:
+            user = CustomUser.objects.get(pk=user_id)
+            mfa = user.mfa_secret
+        except (CustomUser.DoesNotExist, MFASecret.DoesNotExist):
+            messages.error(request, "Session expired. Please log in again.")
+            return redirect("login")
+ 
+        if verify_totp(mfa.secret, code):
+            del request.session["mfa_user_id"]
+            request.session.cycle_key()
+            login(request, user)
+            log_action(request, "LOGIN_MFA_SUCCESS", f"User {user.username} completed MFA successfully.")
+            return redirect("dashboard")
+        else:
+            log_action(request, "LOGIN_MFA_FAILED", f"User {user.username} entered wrong MFA code.")
+            messages.error(request, "Invalid verification code. Please try again.")
+            return render(request, "accounts/mfa_verify.html", {"form": MFAVerifyForm()})
+ 
+ 
+class MFASetupView(LoginRequiredMixin, View):
+    def get(self, request):
+        secret = generate_totp_secret()
+        request.session["mfa_pending_secret"] = secret
+        qr_code = generate_qr_code_base64(secret, request.user.username)
+        return render(request, "accounts/mfa_setup.html", {"qr_code": qr_code, "secret": secret, "form": MFASetupConfirmForm()})
+ 
+    def post(self, request):
+        form = MFASetupConfirmForm(request.POST)
+        if not form.is_valid():
+            secret = request.session.get("mfa_pending_secret", generate_totp_secret())
+            request.session["mfa_pending_secret"] = secret
+            qr_code = generate_qr_code_base64(secret, request.user.username)
+            return render(request, "accounts/mfa_setup.html", {"qr_code": qr_code, "secret": secret, "form": form})
+ 
+        code = form.cleaned_data["code"]
+        secret = request.session.get("mfa_pending_secret")
+        if not secret:
+            messages.error(request, "Setup session expired. Please try again.")
+            return redirect("mfa_setup")
+ 
+        if not verify_totp(secret, code):
+            messages.error(request, "Invalid code. Make sure your authenticator app is set up correctly.")
+            qr_code = generate_qr_code_base64(secret, request.user.username)
+            return render(request, "accounts/mfa_setup.html", {"qr_code": qr_code, "secret": secret, "form": MFASetupConfirmForm()})
+ 
+        MFASecret.objects.update_or_create(user=request.user, defaults={"secret": secret, "enabled": True},)
+        del request.session["mfa_pending_secret"]
+ 
+        log_action(request, "MFA_ENABLED", f"User {request.user.username} enabled MFA.")
+        messages.success(request, "Two-factor authentication has been enabled on your account.")
+        return redirect("dashboard")
+ 
+ 
+class MFADisableView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "accounts/mfa_disable.html", {"form": MFAVerifyForm()})
+ 
+    def post(self, request):
+        form = MFAVerifyForm(request.POST)
+        if not form.is_valid():
+            return render(request, "accounts/mfa_disable.html", {"form": form})
+ 
+        code = form.cleaned_data["code"]
+ 
+        try:
+            mfa = request.user.mfa_secret
+        except MFASecret.DoesNotExist:
+            messages.info(request, "MFA is not enabled on your account.")
+            return redirect("dashboard")
+ 
+        if verify_totp(mfa.secret, code):
+            mfa.delete()
+            log_action(request, "MFA_DISABLED", f"User {request.user.username} disabled MFA.")
+            messages.success(request, "Two-factor authentication has been disabled.")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Invalid code.")
+            return render(request, "accounts/mfa_disable.html", {"form": MFAVerifyForm()})
