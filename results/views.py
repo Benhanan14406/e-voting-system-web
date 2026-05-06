@@ -7,11 +7,6 @@ from .models import Result
 from audit.utils import log_action
 from voting.models import Vote
 
-def createResult(election):
-    total_votes = Vote.objects.filter(election=election).count()
-    result = Result.objects.create(election=election, total_votes=total_votes)
-    return result
-
 class ResultsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         election = get_object_or_404(Election, pk=pk)

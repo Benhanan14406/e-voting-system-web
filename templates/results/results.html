@@ -21,14 +21,14 @@
     </tr>
   </thead>
   <tbody>
-    {% for candidate in results %}
+    {% for candidate, votes in results.items %}
     <tr>
       <td>{{ forloop.counter }}</td>
       <td><strong>{{ candidate.name }}</strong></td>
-      <td>{{ candidate.vote_count }}</td>
+      <td>{{ votes }}</td>
       <td>
         {% if total_votes > 0 %}
-          {% widthratio candidate.vote_count total_votes 100 %}%
+          {% widthratio votes total_votes 100 %}%
         {% else %}
           0%
         {% endif %}
