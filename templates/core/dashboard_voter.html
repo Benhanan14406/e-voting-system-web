@@ -5,6 +5,17 @@
 <h2>Voter Dashboard</h2>
 <p>Welcome, {{ request.user.username }}.</p>
 
+<p>
+  <strong>Two-Factor Authentication:</strong>
+  {% if request.user.mfa_secret.enabled %}
+    Enabled &nbsp;|&nbsp; <a href="{% url 'mfa_disable' %}">Disable</a>
+  {% else %}
+    Not enabled &nbsp;|&nbsp; <a href="{% url 'mfa_setup' %}">Enable (recommended)</a>
+  {% endif %}
+</p>
+
+<hr>
+
 <h3>Open Elections</h3>
 <table border="1" cellpadding="6">
   <thead>
