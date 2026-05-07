@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Election{% endblock %}
+{% block content %}
+
+<h2>{{ action }} Election</h2>
+
+<form method="POST">
+  {% csrf_token %}
+
+  <p>
+    <label for="id_title">Title</label><br>
+    {{ form.title }}
+    {% if form.title.errors %}<br><small>{{ form.title.errors }}</small>{% endif %}
+  </p>
+
+  <p>
+    <label for="id_description">Description</label><br>
+    {{ form.description }}
+    {% if form.description.errors %}<br><small>{{ form.description.errors }}</small>{% endif %}
+  </p>
+
+  <p>
+    <label for="id_start_date">Start Date</label><br>
+    {{ form.start_date }}
+    {% if form.start_date.errors %}<br><small>{{ form.start_date.errors }}</small>{% endif %}
+  </p>
+
+  <p>
+    <label for="id_end_date">End Date</label><br>
+    {{ form.end_date }}
+    {% if form.end_date.errors %}<br><small>{{ form.end_date.errors }}</small>{% endif %}
+  </p>
+
+  {% if form.non_field_errors %}
+    <p><small>{{ form.non_field_errors }}</small></p>
+  {% endif %}
+
+  <button type="submit">{{ action }}</button>
+  <a href="{% url 'election_list' %}">Cancel</a>
+</form>
+
+{% endblock %}

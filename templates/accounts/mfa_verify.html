@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Two-Factor Verification{% endblock %}
+{% block content %}
+
+<h2>Two-Factor Verification</h2>
+<p>Open your authenticator app and enter the 6-digit code for <strong>E-Voting System</strong>.</p>
+
+<form method="POST" action="{% url 'mfa_verify' %}">
+  {% csrf_token %}
+  <p>
+    <label for="id_code">Authenticator code</label><br>
+    <input
+      type="text"
+      id="id_code"
+      name="code"
+      maxlength="6"
+      minlength="6"
+      required
+      autocomplete="one-time-code"
+      inputmode="numeric"
+      pattern="[0-9]{6}"
+      placeholder="000000"
+    >
+    {% if form.code.errors %}
+      <br><small>{{ form.code.errors }}</small>
+    {% endif %}
+  </p>
+  <button type="submit">Verify</button>
+</form>
+
+<p><a href="{% url 'login' %}">← Back to login</a></p>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+django>=5.2
+python-dotenv
+bcrypt
+django[bcrypt]
+django-ratelimit
+bleach
+django-simple-captcha
+Pillow
+pyotp
+qrcode
