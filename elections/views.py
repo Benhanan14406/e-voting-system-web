@@ -71,6 +71,19 @@ class ElectionCloseView(AdminRequiredMixin, View):
         messages.success(request, f"\"{election.title}\" has been closed.")
 
         return redirect("election_list")
+    
+class ElectionDeleteView(AdminRequiredMixin, View):
+    def post(self, request, pk):
+        election = get_object_or_404(Election, pk=pk)
+        if election.status != "Pending":
+            messages.error(request, "The election cannot be removed it is open!")
+            return redirect("election_list")
+        
+        log_action(request, "ELECTION_DELETE", f"Election \"{election.title}\" deleted by {request.user.username}")
+        election.delete()
+        messages.success(request, "Election removed.")
+
+        return redirect("election_list")
 
 
 class CandidateListView(AdminRequiredMixin, View):
@@ -112,7 +125,7 @@ class CandidateDeleteView(AdminRequiredMixin, View):
             messages.error(request, "Candidates cannot be removed once the election is open!")
             return redirect("candidate_list", pk=election_pk)
         
-        log_action(request, "CANDIDATE_DELETE", f"Candidate \"{candidate.name}\" deleted")
+        log_action(request, "CANDIDATE_DELETE", f"Candidate \"{candidate.name}\" deleted by {request.user.username}")
         candidate.delete()
         messages.success(request, "Candidate removed.")
 
