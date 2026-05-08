@@ -9,10 +9,10 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, choices=[(role, role) for role in ROLE_ENUM], default='Voter')
 
     def is_admin(self):
-        return self.role == 'Admin'
+        return self.role == "Admin"
 
     def is_voter(self):
-        return self.role == 'Voter'
+        return self.role == "Voter"
     
 class LoginAttempt(models.Model):
     username = models.CharField(max_length=150)

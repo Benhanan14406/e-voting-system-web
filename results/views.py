@@ -5,7 +5,6 @@ from django.contrib import messages
 from elections.models import Election
 from .models import Result
 from audit.utils import log_action
-from voting.models import Vote
 
 class ResultsView(LoginRequiredMixin, View):
     def get(self, request, pk):

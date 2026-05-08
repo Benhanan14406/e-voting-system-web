@@ -5,7 +5,7 @@ from .models import AuditLog
 
 class AuditLogView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
-        return self.request.user.role == "Admin"
+        return self.request.user.is_admin()
 
     def get(self, request):
         logs = AuditLog.objects.select_related('user').all()[:200]

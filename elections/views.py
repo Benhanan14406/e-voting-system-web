@@ -10,7 +10,7 @@ from results.models import Result
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.role == "Admin"
+        return self.request.user.is_admin()
 
 
 class ElectionListView(AdminRequiredMixin, View):
