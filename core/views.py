@@ -5,11 +5,11 @@ from voting.models import Vote, generate_voter_token
 
 @login_required
 def dashboard(request):
-    if request.user.role == "Admin":
+    if request.user.is_admin():
         elections = Election.objects.all().order_by("-created_at")
         return render(request, "core/dashboard_admin.html", {"elections": elections})
     else:
-        elections = Election.objects.filter(status="Open")
+        elections = Election.objects.filter(status__in=["Open", "Closed"]).order_by("-created_at")
         voted_ids = [
             e.pk for e in elections
             if Vote.objects.filter(
