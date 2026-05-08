@@ -152,3 +152,4 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_null',)
 CAPTCHA_LENGTH = 1
 CAPTCHA_TIMEOUT = 5 
+CAPTCHA_TEST_MODE = True
