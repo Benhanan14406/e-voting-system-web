@@ -160,10 +160,6 @@ class XSSTest(TestCase):
             self.assertNotIn("<script>", candidate.name)
 
     def test_xss_payload_not_rendered_as_html_in_list_view(self):
-        """
-        The election list page must HTML-escape any stored payload,
-        so the raw tag never appears in the response source.
-        """
         payload = "<script>alert('XSS')</script>Safe Title"
         self._create_election_with_title(payload)
         response = self.client.get(reverse("election_list"))
@@ -493,10 +489,6 @@ class UsernameEnumerationTest(TestCase):
             msg_prefix="Must not reveal that username does not exist")
 
     def test_error_messages_are_identical_for_both_scenarios(self):
-        """
-        The exact message text for a wrong-password attempt vs a
-        non-existent-user attempt must be character-for-character identical.
-        """
         resp_wrong_pass = self._post_login(
             self.existing_user.username, "WrongPass999"
         )
