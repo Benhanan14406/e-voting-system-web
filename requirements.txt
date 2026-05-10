@@ -8,3 +8,4 @@ django-simple-captcha
 Pillow
 pyotp
 qrcode
+bs4
