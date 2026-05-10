@@ -459,8 +459,6 @@ class CSRFProtectionTest(TestCase):
         self.assertEqual(response.status_code, 405,
             "Logout must not be accessible via GET (method not allowed)")
 
-
-
 class UsernameEnumerationTest(TestCase):
 
     def setUp(self):
