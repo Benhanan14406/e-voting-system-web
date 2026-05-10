@@ -44,3 +44,5 @@ coverage.xml
 # Static files (collected)
 staticfiles/
 static_root/
+
+tests_security.py

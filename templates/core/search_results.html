@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Search Elections{% endblock %}
+{% block content %}
+
+<h2>Search Results</h2>
+
+<div style="margin-bottom: 20px;">
+  {% if search_error %}
+    <p style="color: #ff6666; font-weight: bold;">⚠️ Search operation failed</p>
+  {% else %}
+    <p><strong>Search Query:</strong> {% if query %}"{{ query }}"{% else %}<em>(none)</em>{% endif %} 
+      {% if query %}<span style="color: green;">✓ Found {{ elections.count }} result(s)</span>{% endif %}
+    </p>
+  {% endif %}
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+
+{% if not search_error %}
+  {% if query %}
+    {% if elections %}
+    <h3>Elections matching "{{ query }}"</h3>
+    <table border="1" cellpadding="6">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Closes</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in elections %}
+        <tr>
+          <td><strong>{{ e.title }}</strong></td>
+          <td>{{ e.description|truncatewords:15 }}</td>
+          <td>{{ e.end_date }}</td>
+          <td>
+            <span style="padding: 4px 8px; border-radius: 4px; 
+              {% if e.status == 'Open' %}background-color: #90EE90;{% elif e.status == 'Closed' %}background-color: #FFB6C6;{% else %}background-color: #FFE4B5;{% endif %}">
+              {{ e.status }}
+            </span>
+          </td>
+          <td>
+            {% if request.user.is_admin %}
+              <a href="{% url 'candidate_list' e.pk %}">Candidates</a>
+              &nbsp;|&nbsp;
+              <a href="{% url 'results' e.pk %}">Results</a>
+            {% else %}
+              {% if e.status == "Closed" %}
+                <a href="{% url 'results' e.pk %}">View Results</a>
+              {% elif e.pk in voted_ids %}
+                <em>Already voted</em>
+              {% else %}
+                <a href="{% url 'vote' e.pk %}">Cast Vote</a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color: #666;">No elections found matching "{{ query }}".</p>
+    {% endif %}
+  {% else %}
+    <p style="color: #666;">Enter a search query above to find elections.</p>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

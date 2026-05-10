@@ -17,6 +17,11 @@
     ({{ request.user.role }})
     &nbsp;|&nbsp;
     <a href="{% url 'dashboard' %}">Dashboard</a>
+    &nbsp;|&nbsp;
+    <form method="GET" action="{% url 'search_elections' %}" style="display:inline;">
+      <input type="text" name="q" placeholder="Search elections..." value="{{ request.GET.q }}" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+      <button type="submit" style="padding: 5px 10px; cursor: pointer;">Search</button>
+    </form>
     {% if request.user.role == "Admin" %}
       &nbsp;|&nbsp;
       <a href="{% url 'election_list' %}">Elections</a>
