@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # Security: Maximum search query length
 MAX_SEARCH_LENGTH = 200
 
-def validate_search_query(query):
+def validate_search_query(query, request):
     """
     Validate search query to prevent injection attempts.
     Returns (is_valid, sanitized_query)
