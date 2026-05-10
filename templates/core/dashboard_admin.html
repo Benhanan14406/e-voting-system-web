@@ -25,16 +25,26 @@
       <td>{{ e.end_date }}</td>
       <td>
         <a href="{% url 'candidate_list' e.pk %}">Candidates</a>
-        &nbsp;|&nbsp;
-        <a href="{% url 'results' e.pk %}">Results</a>
+
+        {% if e.status == "Closed" %}
+          &nbsp;|&nbsp;
+          <a href="{% url 'results' e.pk %}">Results</a>
+        {% endif %}
 
         {% if e.status == "Pending" %}
-        &nbsp;|&nbsp;
-        
-        <form method="POST" action="{% url 'election_open' e.pk %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit">Open</button>
-        </form>
+          &nbsp;|&nbsp;
+          
+          <form method="POST" action="{% url 'election_open' e.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Open</button>
+          </form>
+
+          &nbsp;|&nbsp;
+
+          <form method="POST" action="{% url 'election_delete' e.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Remove</button>
+          </form>
         {% endif %}
 
         {% if e.status == "Open" %}
