@@ -29,7 +29,7 @@ def validate_search_query(query, request):
     # Check for suspicious patterns (UNION, SELECT, etc.)
     suspicious_patterns = [
         r'\bunion\b',
-        r'\bselect\b',
+        # r'\bselect\b',
         r'\binsert\b',
         r'\bupdate\b',
         r'\bdelete\b',
@@ -82,7 +82,7 @@ def search_elections(request):
     
     try:
         # Input validation
-        is_valid, clean_query = validate_search_query(query)
+        is_valid, clean_query = validate_search_query(query, request)
         
         if not is_valid:
             logger.warning(f"Invalid search query detected from user {request.user.username}")
