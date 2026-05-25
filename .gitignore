@@ -46,3 +46,4 @@ staticfiles/
 static_root/
 
 tests_security.py
+tests_output.txt
